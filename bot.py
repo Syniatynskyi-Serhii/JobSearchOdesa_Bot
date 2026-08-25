@@ -11,11 +11,10 @@ def get_jobs():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
     
-    # cityId 2 — це Одеса в системі Robota.ua
+    # Отримуємо більше результатів для подальшого відбору Одеси
     payload = {
         "keyWords": "маркетинг",
-        "cityId": 2,          
-        "pageSize": 5,
+        "pageSize": 40,
         "page": 1
     }
     
@@ -28,20 +27,24 @@ def get_jobs():
         data = response.json()
         documents = data.get('documents', [])
         
-        if not documents:
-            print("API повернув порожній список вакансій.")
-            return []
-        
         jobs = []
         for doc in documents:
-            title = doc.get('name', 'Без назви')
-            vacancy_id = doc.get('id')
-            company = doc.get('companyName', 'Компанія не вказана')
-            cityName = doc.get('cityName', 'Одеса')
-            link = f"https://robota.ua/company{doc.get('companyId', 0)}/vacancy{vacancy_id}"
+            cityName = doc.get('cityName', '')
+            cityId = doc.get('cityId', 0)
             
-            jobs.append(f"<b>{title}</b> ({cityName})\n<i>{company}</i>\n<a href='{link}'>Переглянути вакансію</a>")
+            # Перевірка на Одесу за назвою або cityId (2 — Одеса)
+            if cityId == 2 or "Одеса" in cityName or "Odesa" in cityName:
+                title = doc.get('name', 'Без назви')
+                vacancy_id = doc.get('id')
+                company = doc.get('companyName', 'Компанія не вказана')
+                link = f"https://robota.ua/company{doc.get('companyId', 0)}/vacancy{vacancy_id}"
+                
+                jobs.append(f"<b>{title}</b>\n<i>{company}</i>\n<a href='{link}'>Переглянути вакансію</a>")
             
+            # Жорстке обмеження: зупиняємося, коли зібрали рівно 5 вакансій
+            if len(jobs) == 5:
+                break
+                
         return jobs
     except Exception as e:
         print(f"Помилка підключення: {e}")
@@ -70,4 +73,4 @@ if __name__ == "__main__":
         send_telegram(message)
         print("Вакансії успішно надіслано в Telegram.")
     else:
-        print("Відповідних вакансій не знайдено.")
+        print("Відповідних вакансій по Одесі не знайдено.")
