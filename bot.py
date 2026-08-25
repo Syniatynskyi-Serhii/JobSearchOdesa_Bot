@@ -5,26 +5,34 @@ import feedparser
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
-# RSS-стрічка Work.ua для категорії "Маркетинг, реклама, PR" в Одесі
 RSS_URL = "https://www.work.ua/rss/odesa-marketing/"
 
 def get_jobs():
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
     try:
-       feed = feedparser.parse(
-    RSS_URL,
-    agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-)
+        response = requests.get(RSS_URL, headers=headers, timeout=10)
+        if response.status_code != 200:
+            print(f"Помилка отримання RSS: Код {response.status_code}")
+            return []
+            
+        feed = feedparser.parse(response.content)
+        
+        if not feed.entries:
+            print("RSS-стрічка порожня.")
+            return []
             
         jobs = []
-        for entry in feed.entries[:5]:  # Беремо 5 останніх вакансій
+        for entry in feed.entries[:5]:
             title = entry.title
             link = entry.link
-            
             jobs.append(f"<b>{title}</b>\n<a href='{link}'>Переглянути вакансію</a>")
             
         return jobs
     except Exception as e:
-        print(f"Помилка читання RSS: {e}")
+        print(f"Помилка підключення або парсингу: {e}")
         return []
 
 def send_telegram(text):
