@@ -1,13 +1,14 @@
 name: Run Bot
 
 on:
-  workflow_dispatch: # Дозволяє запуск вручну
   schedule:
-    - cron: '0 8 * * *' # Запуск щодня о 08:00 UTC
+    - cron: '0 9 * * *'  # Запуск щодня
+  workflow_dispatch:      # Ручний запуск
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,9 +21,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # сюди додаватимемо бібліотеки (наприклад: pip install requests)
+          pip install -r requirements.txt
 
       - name: Execute Bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python bot.py
