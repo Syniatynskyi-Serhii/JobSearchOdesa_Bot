@@ -11,11 +11,11 @@ def get_jobs():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
     
-    # Використовуємо точний текстовий пошук замість rubricId
+    # cityId 2 — це Одеса в системі Robota.ua
     payload = {
         "keyWords": "маркетинг",
-        "cityId": 2,          # ID Одеси
-        "pageSize": 20,       # Беремо запас для подальшої фільтрації
+        "cityId": 2,          
+        "pageSize": 5,
         "page": 1
     }
     
@@ -28,24 +28,19 @@ def get_jobs():
         data = response.json()
         documents = data.get('documents', [])
         
+        if not documents:
+            print("API повернув порожній список вакансій.")
+            return []
+        
         jobs = []
         for doc in documents:
-            cityName = doc.get('cityName', '')
-            
-            # Жорсткий фільтр за містом (пропускаємо все, що не Одеса)
-            if "Одеса" not in cityName and "Odesa" not in cityName:
-                continue
-                
             title = doc.get('name', 'Без назви')
             vacancy_id = doc.get('id')
             company = doc.get('companyName', 'Компанія не вказана')
+            cityName = doc.get('cityName', 'Одеса')
             link = f"https://robota.ua/company{doc.get('companyId', 0)}/vacancy{vacancy_id}"
             
-            jobs.append(f"<b>{title}</b> (Одеса)\n<i>{company}</i>\n<a href='{link}'>Переглянути вакансію</a>")
-            
-            # Зупиняємо збір, коли сформовано 5 відповідних вакансій
-            if len(jobs) == 5:
-                break
+            jobs.append(f"<b>{title}</b> ({cityName})\n<i>{company}</i>\n<a href='{link}'>Переглянути вакансію</a>")
             
         return jobs
     except Exception as e:
@@ -71,7 +66,7 @@ if __name__ == "__main__":
     job_list = get_jobs()
     
     if job_list:
-        message = "<b>🚀 Топ-5 точних вакансій (Маркетинг, Одеса):</b>\n\n" + "\n\n".join(job_list)
+        message = "<b>🚀 Топ-5 вакансій (Маркетинг, Одеса):</b>\n\n" + "\n\n".join(job_list)
         send_telegram(message)
         print("Вакансії успішно надіслано в Telegram.")
     else:
