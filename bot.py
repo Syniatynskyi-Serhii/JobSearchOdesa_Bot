@@ -14,22 +14,22 @@ def send_telegram_message(text):
     requests.post(url, data=payload)
 
 def parse_jobs():
-    # Пошук нових вакансій в Одесі на Work.ua
-    url = "https://www.work.ua/jobs-odesa/"
+    # Пошук вакансій з маркетингу в Одесі на Work.ua
+    url = "https://www.work.ua/jobs-odesa-marketing-advertising/"
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        print("Не вдалося отримати сторінку")
+        print("Помилка запиту до сайту")
         return
 
     soup = BeautifulSoup(response.text, "html.parser")
     cards = soup.find_all("div", class_="job-link")
 
-    message = "<b>🔔 Нові вакансії в Одесі (Work.ua):</b>\n\n"
+    message = "<b>📊 Нові вакансії з маркетингу в Одесі:</b>\n\n"
     count = 0
 
-    for card in cards[:5]:  # Беремо перші 5 свіжих вакансій
+    for card in cards[:5]:
         title_elem = card.find("h2")
         if not title_elem:
             continue
@@ -45,9 +45,7 @@ def parse_jobs():
 
     if count > 0:
         send_telegram_message(message)
-        print(f"Успішно відправлено {count} вакансій.")
-    else:
-        print("Вакансій не знайдено.")
+        print(f"Відправлено {count} вакансій.")
 
 if __name__ == "__main__":
     parse_jobs()
