@@ -12,9 +12,12 @@ URL = "https://www.work.ua/jobs-odesa-marketing/"
 def get_jobs():
     # Заголовки для імітації реального браузера (вирішує "Помилку запиту до сайту")
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7"
-    }
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Cache-Control': 'max-age=0',
+    'Upgrade-Insecure-Requests': '1'
+}
     
     try:
         response = requests.get(URL, headers=headers, timeout=10)
