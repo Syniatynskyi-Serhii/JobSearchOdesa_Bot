@@ -10,10 +10,10 @@ RSS_URL = "https://www.work.ua/rss/odesa-marketing/"
 
 def get_jobs():
     try:
-        feed = feedparser.parse(RSS_URL)
-        if not feed.entries:
-            print("RSS-стрічка порожня або не вдалося зчитати дані.")
-            return []
+       feed = feedparser.parse(
+    RSS_URL,
+    agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+)
             
         jobs = []
         for entry in feed.entries[:5]:  # Беремо 5 останніх вакансій
